@@ -1,10 +1,46 @@
 body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #333;
+  color: white;
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
   margin: 0;
-  padding: 20px;
 }
 
-h1 {
-  color: #333;
+.container {
+  text-align: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 5px;
+  margin: 20px auto;
+}
+
+.cell {
+  background-color: #444;
+  border: 2px solid #555;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cell:hover {
+  background-color: #555;
+}
+
+.winning-message {
+  display: none;
+  font-size: 1.5rem;
+}
+
+.winning-message.active {
+  display: block;
 }
