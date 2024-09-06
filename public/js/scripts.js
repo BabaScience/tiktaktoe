@@ -17,7 +17,6 @@ restartButton.addEventListener('click', restartGame);
 
 function joinRoom() {
     room = document.getElementById('roomName').value;
-    debugger
     if (room) {
         socket.emit('joinRoom', room);
         document.getElementById('room').style.display = 'none';

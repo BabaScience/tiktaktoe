@@ -10,38 +10,53 @@ const server = http.createServer(app);
 const io = new Server(server);
 require('dotenv').config();
 
-const client = redis.createClient();
+const redisURL =  'redis://localhost:6379';
+
+console.log('Connecting to Redis:', redisURL);
+
+const client = redis.createClient(redisURL);
 client.on('error', (err) => {
     console.error('Redis error:', err);
 });
 
 client.on('connect', () => {
-    console.log('Connected to Redis');
+  console.log('Connected to Redis');
+  console.log('Redis server is running on http://localhost:6379');
 });
+
+
+(async () => {
+    await client.connect();
+})();
+
 // const getAsync = promisify(client.get).bind(client);
 // const setAsync = promisify(client.set).bind(client);
 
-function getAsync(room) {
-    return new Promise((resolve, reject) => {
-        client.get(room, (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data);
-            }
-        });
+async function getAsync(room) {
+    return new Promise(async (resolve, reject) => {
+        console.log('Starting getAsync');
+        try {
+            const data = await client.get(room);
+            console.log('Data:', data);
+            resolve(data);
+        }
+        catch (err) {
+            console.error('Error:', err);
+            reject(err);
+        }
     });
 }
 
 function setAsync(room, data) {
-    return new Promise((resolve, reject) => {
-        client.set(room, data, (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
+    return new Promise(async(resolve, reject) => {
+        try {
+            await client.set(room, data);
+            resolve();
+        }
+        catch (err) {
+            console.error('Error:', err);
+            reject(err);
+        }
     });
 }
 
@@ -60,8 +75,10 @@ io.on('connection', socket => {
         const gameState = await getAsync(room);
 
         if (gameState) {
+            console.log('Game state:', gameState);
             socket.emit('gameState', JSON.parse(gameState));
         } else {
+            console.log('Creating new game state');
             const initialState = {
                 board: Array(9).fill(null),
                 currentPlayer: 'X',
